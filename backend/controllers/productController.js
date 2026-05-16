@@ -71,7 +71,7 @@ const updateProduct = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Server error' })
     }
-}
+};
 
 const deleteProduct = async (req, res) => {
     try {
@@ -96,4 +96,4 @@ module.exports = {
     createProduct,
     updateProduct,
     deleteProduct
-}
+};
