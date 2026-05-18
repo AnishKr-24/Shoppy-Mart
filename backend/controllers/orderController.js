@@ -11,7 +11,7 @@ const createorder = async (req, res) => {
 
         }
         else {
-            const order = new order({
+            const order = new Order({
                 user: req.user._id,
                 items,
                 totalAmount,
@@ -45,7 +45,8 @@ const createorder = async (req, res) => {
 
 const myOrders = async (req, res) => {
     try {
-        const orders = await Order.find({ user: req.user._id }).popular('product.productid', 'name price');
+        const orders = await Order.find({ user: req.user._id }).populate('product.productid', 'name price');
+        res.status(200).json(orders);
     } catch (error){
         res.status(500).json({ message: 'Error fetching orders', error });
     }
@@ -79,7 +80,7 @@ const updateOrderStatus = async (req, res) => {
 };
 
 module.exports = {
-    createorder,
+    createOrder: createorder,
     myOrders,
     getOrders,
     updateOrderStatus,
