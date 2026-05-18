@@ -42,3 +42,45 @@ const createorder = async (req, res) => {
         res.status(500).json({ message: 'Error creating order', error });
     }
 };
+
+const myOrders = async (req, res) => {
+    try {
+        const orders = await Order.find({ user: req.user._id }).popular('product.productid', 'name price');
+    } catch (error){
+        res.status(500).json({ message: 'Error fetching orders', error });
+    }
+};
+
+const getOrders = async (req, res) => {
+    try {
+        const orders = await Order.find({}).populate('userId', 'id name') 
+        res.json(orders);
+
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching orders', error });
+    }
+};
+
+const updateOrderStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        const order = await Order.findById(req.params.id);
+        if(order) {
+            order.status = status;
+            await order.save();
+            res.json({message: 'order status updated', order});
+        }
+        else {
+            res.status(400).json({message: 'Order not found'});
+        }
+    } catch(error) {
+        res.status(500).json({message: 'Error updating oder status', error});
+    }
+};
+
+module.exports = {
+    createorder,
+    myOrders,
+    getOrders,
+    updateOrderStatus,
+};
