@@ -12,6 +12,7 @@ const Navbar = () => {
 
     return (
         <nav className="navbar">
+            
             <div className="navbar-brand">
                 <Link to="/" className="brand-link">
                     <img src="./src/assets/Logo.png" alt="Shoppy_Mart Logo" className="navbar-logo" />
@@ -56,6 +57,7 @@ const Navbar = () => {
                     </>
                 )}
             </div>
+
         </nav>
     )
 }

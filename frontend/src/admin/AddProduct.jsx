@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import '../styles/add-product.scss';
 
 const AddProduct = () => {
   const { user } = useContext(AuthContext);
@@ -52,51 +53,73 @@ const AddProduct = () => {
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '40px auto', background: '#18181b', padding: '40px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-      <h2 style={{ color: '#f97316', marginBottom: '20px' }}>Add New Product</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-        <input 
-          type="text" placeholder="Product Name" required 
-          onChange={(e) => setFormData({...formData, name: e.target.value})} 
-          style={inputStyle} 
-        />
-        <textarea 
-          placeholder="Description" required rows="4"
-          onChange={(e) => setFormData({...formData, description: e.target.value})} 
-          style={inputStyle} 
-        />
-        <input 
-          type="number" placeholder="Price" required 
-          onChange={(e) => setFormData({...formData, price: e.target.value})} 
-          style={inputStyle} 
-        />
-        <input 
-          type="text" placeholder="Category" required 
-          onChange={(e) => setFormData({...formData, category: e.target.value})} 
-          style={inputStyle} 
-        />
-        <input 
-          type="number" placeholder="Stock Quantity" required 
-          onChange={(e) => setFormData({...formData, stock: e.target.value})} 
-          style={inputStyle} 
-        />
-        
-        <div style={{ padding: '15px', border: '1px dashed #f97316', borderRadius: '8px' }}>
-          <label style={{ display: 'block', marginBottom: '10px', color: '#a1a1aa' }}>Upload Product Image (Cloudinary)</label>
+    <div className="add-product-container">
+      <h2>Add New Product</h2>
+      <form onSubmit={handleSubmit} className="product-form">
+        <div className="form-group">
           <input 
-            type="file" accept="image/*" required 
-            onChange={(e) => setImage(e.target.files[0])} 
-            style={{ color: '#fff' }}
+            type="text" 
+            placeholder="Product Name" 
+            required 
+            onChange={(e) => setFormData({...formData, name: e.target.value})} 
           />
         </div>
 
-        <button type="submit" disabled={loading} className="btn" style={{ marginTop: '10px' }}>
+        <div className="form-group">
+          <textarea 
+            placeholder="Description" 
+            required 
+            rows="4"
+            onChange={(e) => setFormData({...formData, description: e.target.value})} 
+          />
+        </div>
+
+        <div className="form-group">
+          <input 
+            type="number" 
+            placeholder="Price" 
+            required 
+            onChange={(e) => setFormData({...formData, price: e.target.value})} 
+          />
+        </div>
+
+        <div className="form-group">
+          <input 
+            type="text" 
+            placeholder="Category" 
+            required 
+            onChange={(e) => setFormData({...formData, category: e.target.value})} 
+          />
+        </div>
+
+        <div className="form-group">
+          <input 
+            type="number" 
+            placeholder="Stock Quantity" 
+            required 
+            onChange={(e) => setFormData({...formData, stock: e.target.value})} 
+          />
+        </div>
+        
+        <div className="image-upload-section">
+          <label>Upload Product Image (Cloudinary)</label>
+          <input 
+            type="file" 
+            accept="image/*" 
+            required 
+            onChange={(e) => setImage(e.target.files[0])} 
+          />
+        </div>
+
+        <button type="submit" disabled={loading} className="submit-button">
           {loading ? 'Uploading & Creating...' : 'Publish Product'}
         </button>
       </form>
     </div>
   );
 };
+
+export default AddProduct;
 
 const inputStyle = {
   padding: '12px',

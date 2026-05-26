@@ -3,11 +3,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import './styles/global.scss'
+import './styles/app.scss'
 
 function App() {
   return (
     <Router>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <div className="app-container">
         <Navbar />
         <main className="main-content">
           <Routes>
