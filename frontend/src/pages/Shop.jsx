@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { mockProducts } from '../data/mockProducts';
 import '../styles/shop.scss';
 
 const Shop = () => {
@@ -14,27 +15,42 @@ const Shop = () => {
   });
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    // Simulate fetching products
+    setTimeout(() => {
       try {
-        const query = new URLSearchParams();
-        if (filters.category !== 'all') query.append('category', filters.category);
-        query.append('sort', filters.sortBy);
+        let filteredProducts = mockProducts;
 
-        const res = await fetch(`/api/products?${query.toString()}`);
-        const data = await res.json();
-        if (res.ok) {
-          setProducts(data);
+        // Filter by category
+        if (filters.category && filters.category !== 'all') {
+          filteredProducts = filteredProducts.filter(p =>
+            p.category.toLowerCase() === filters.category.toLowerCase()
+          );
         }
+
+        // Filter by price range
+        filteredProducts = filteredProducts.filter(p =>
+          p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
+        );
+
+        // Sort
+        if (filters.sortBy === 'price-low') {
+          filteredProducts.sort((a, b) => a.price - b.price);
+        } else if (filters.sortBy === 'price-high') {
+          filteredProducts.sort((a, b) => b.price - a.price);
+        } else if (filters.sortBy === 'popular') {
+          filteredProducts.sort((a, b) => b.rating - a.rating);
+        }
+
+        setProducts(filteredProducts);
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
         setLoading(false);
       }
-    };
-    fetchProducts();
+    }, 300);
   }, [filters]);
 
-  const categories = ['all', 'electronics', 'fashion', 'home', 'sports', 'books', 'toys'];
+  const categories = ['all', 'electronics', 'audio', 'accessories'];
   const sortOptions = [
     { value: 'newest', label: 'Newest' },
     { value: 'price-low', label: 'Price: Low to High' },

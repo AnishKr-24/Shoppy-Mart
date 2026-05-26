@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getProductById, getRelatedProducts } from '../data/mockProducts';
 import '../styles/product-details.scss';
 
 const ProductDetails = () => {
@@ -12,35 +13,21 @@ const ProductDetails = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    // Simulate API call with mock data
+    setTimeout(() => {
       try {
-        const res = await fetch(`/api/products/${productId}`);
-        const data = await res.json();
-        if (res.ok) {
-          setProduct(data);
-          // Fetch related products
-          fetchRelatedProducts(data.category);
+        const productData = getProductById(productId || '1');
+        if (productData) {
+          setProduct(productData);
+          const related = getRelatedProducts(productData.category, productId, 4);
+          setRelatedProducts(related);
         }
       } catch (error) {
         console.error('Error fetching product:', error);
       } finally {
         setLoading(false);
       }
-    };
-
-    const fetchRelatedProducts = async (category) => {
-      try {
-        const res = await fetch(`/api/products?category=${category}&limit=4`);
-        const data = await res.json();
-        if (res.ok) {
-          setRelatedProducts(data.filter(p => p._id !== productId));
-        }
-      } catch (error) {
-        console.error('Error fetching related products:', error);
-      }
-    };
-
-    fetchProduct();
+    }, 300);
   }, [productId]);
 
   const handleAddToCart = () => {
@@ -69,13 +56,13 @@ const ProductDetails = () => {
         {/* Product Images */}
         <div className="product-images">
           <div className="main-image">
-            <img src={product.image || '/placeholder.png'} alt={product.name} />
+            <img src={product.images?.[selectedImage] || product.image} alt={product.name} />
           </div>
           <div className="image-thumbnails">
-            {[product.image, product.image, product.image].map((img, idx) => (
+            {(product.images || [product.image, product.image, product.image]).map((img, idx) => (
               <img
                 key={idx}
-                src={img || '/placeholder.png'}
+                src={img}
                 alt={`${product.name} ${idx + 1}`}
                 className={`thumbnail ${selectedImage === idx ? 'active' : ''}`}
                 onClick={() => setSelectedImage(idx)}
@@ -93,8 +80,8 @@ const ProductDetails = () => {
 
           {/* Rating */}
           <div className="product-rating">
-            <div className="stars">★★★★★</div>
-            <span className="rating-count">(124 reviews)</span>
+            <div className="stars">{'★'.repeat(Math.round(product.rating || 5))}{'☆'.repeat(5 - Math.round(product.rating || 5))}</div>
+            <span className="rating-count">({product.reviews} reviews)</span>
           </div>
 
           {/* Price */}
@@ -114,7 +101,11 @@ const ProductDetails = () => {
           <div className="product-specs">
             <h3>Specifications</h3>
             <ul>
-              <li><strong>Category:</strong> {product.category}</li>
+              {product.specs && Object.entries(product.specs).map(([key, value]) => (
+                <li key={key}>
+                  <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {value}
+                </li>
+              ))}
               <li><strong>Stock Available:</strong> {product.stock} units</li>
               <li><strong>Shipping:</strong> Free shipping on orders above ₹500</li>
               <li><strong>Returns:</strong> 30-day money-back guarantee</li>
@@ -145,18 +136,16 @@ const ProductDetails = () => {
 
           {/* Benefits */}
           <div className="product-benefits">
-            <div className="benefit">
-              <span className="icon">✓</span>
-              <p>100% Authentic Products</p>
-            </div>
-            <div className="benefit">
-              <span className="icon">✓</span>
-              <p>Secure Checkout</p>
-            </div>
-            <div className="benefit">
-              <span className="icon">✓</span>
-              <p>Fast & Free Delivery</p>
-            </div>
+            {(product.benefits || [
+              '✓ 100% Authentic Products',
+              '✓ Secure Checkout',
+              '✓ Fast & Free Delivery'
+            ]).map((benefit, idx) => (
+              <div key={idx} className="benefit">
+                <span className="icon">{benefit.split(' ')[0]}</span>
+                <p>{benefit.substring(2)}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
