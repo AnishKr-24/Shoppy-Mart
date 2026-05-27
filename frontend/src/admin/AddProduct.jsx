@@ -120,15 +120,3 @@ const AddProduct = () => {
 };
 
 export default AddProduct;
-
-const inputStyle = {
-  padding: '12px',
-  background: '#09090b',
-  border: '1px solid #27272a',
-  borderRadius: '6px',
-  color: '#fff',
-  fontSize: '15px',
-  outline: 'none'
-};
-
-export default AddProduct;

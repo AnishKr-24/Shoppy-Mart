@@ -20,6 +20,10 @@ import Terms from './pages/Terms'
 import ShippingInfo from './pages/ShippingInfo'
 import OrderConfirmation from './pages/OrderConfirmation'
 
+// Import admin pages
+import AdminDashboard from './admin/AdminDashboard'
+import AddProduct from './admin/AddProduct'
+
 // Import all styles
 import './styles/global.scss'
 import './styles/app.scss'
@@ -69,6 +73,10 @@ function App() {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/shipping-info" element={<ShippingInfo />} />
+
+            {/* Admin Pages */}
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/add-product" element={<AddProduct />} />
           </Routes>
         </main>
         <Footer />

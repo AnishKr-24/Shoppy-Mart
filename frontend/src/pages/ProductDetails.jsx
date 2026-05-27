@@ -43,11 +43,11 @@ const ProductDetails = () => {
 
   if (loading) {
     return <div className="loading-page">Loading product details...</div>;
-  }
+  };
 
   if (!product) {
     return <div className="error-page">Product not found</div>;
-  }
+  };
 
   return (
     <div className="product-details-page">
@@ -172,6 +172,7 @@ const ProductDetails = () => {
       )}
     </div>
   );
+  
 };
 
 export default ProductDetails;
