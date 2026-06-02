@@ -42,7 +42,7 @@ const AdminDashboard = () => {
         <h2>Admin Dashboard</h2>
       </div>
       <p className="dashboard-welcome">Welcome back, <span className="welcome-name">{user?.name}</span></p>
-      
+
       {stats ? (
         <div className="stats-grid">
           <div className="stat-card">
@@ -68,12 +68,14 @@ const AdminDashboard = () => {
 
       <div className="admin-controls">
         <h3>Administrative Controls</h3>
+
         <div className="controls-buttons">
           <button className="btn" onClick={() => navigate('/admin/add-product')}>+ Add Product</button>
           <button className="btn secondary" onClick={() => navigate('/admin/products')}>📦 Manage Products</button>
           <button className="btn secondary" onClick={() => navigate('/admin/orders')}>🚚 Manage Orders</button>
           <button className="btn secondary" onClick={() => navigate('/admin/users')}>👥 Users Directory</button>
         </div>
+
       </div>
     </div>
   );

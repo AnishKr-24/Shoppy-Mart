@@ -16,7 +16,7 @@ const AddProduct = () => {
   if (!user || user.role !== 'admin') {
     navigate('/');
     return null;
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
