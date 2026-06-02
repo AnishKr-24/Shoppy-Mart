@@ -24,7 +24,7 @@ const Home = () => {
 
     const categories = [
         { name: 'Electronics', icon: '💻' },
-        { name: 'Audio', icon: '🎵' },
+        // { name: 'Audio', icon: '🎵' },
         { name: 'Accessories', icon: '🎒' },
         { name: 'Home & Garden', icon: '🏠' },
         { name: 'Sports', icon: '⚽' },

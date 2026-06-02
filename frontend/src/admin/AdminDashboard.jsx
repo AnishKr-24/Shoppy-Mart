@@ -40,7 +40,7 @@ const AdminDashboard = () => {
       <div className="dashboard-header">
         <img src="/ShopNestLogo.png" alt="Logo" className="header-logo" />
         <h2>Admin Dashboard</h2>
-      </div>
+      </div>   
       <p className="dashboard-welcome">Welcome back, <span className="welcome-name">{user?.name}</span></p>
 
       {stats ? (
@@ -77,6 +77,7 @@ const AdminDashboard = () => {
         </div>
 
       </div>
+      
     </div>
   );
 };
