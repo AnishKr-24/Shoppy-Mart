@@ -1,12 +1,14 @@
 const express = require("express")
 const router = express.Router()
-const { registerUser, loginUser, getUsers } = require("../controllers/authController");
+const { registerUser, loginUser, getUsers, updateProfile } = require("../controllers/authController");
 const { protect } = require('../middleware/authMiddleware');
 const { admin } = require('../middleware/adminMiddleware');
 
 router.post("/register", registerUser);
+router.post("/signup", registerUser);
 router.post("/login", loginUser);
 router.get("/users", protect, admin, getUsers);
+router.put('/profile', protect, updateProfile);
 
 // router.post("/verify-email", async(req, res) => {
 //     try {

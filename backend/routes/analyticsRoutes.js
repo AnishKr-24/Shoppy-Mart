@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { protect } = require("../middleware/authMiddleware");
 const { admin } = require("../middleware/adminMiddleware");
+const Order = require('../model/Order');
+const Product = require('../model/Product');
+const User = require('../model/User');
 
 // Sales Analytics
 router.get("/sales", protect, admin, async (req, res) => {
@@ -40,6 +43,28 @@ router.get("/revenue", protect, admin, async (req, res) => {
     res.status(200).json({ message: "Revenue analytics data" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// Summary analytics for dashboard
+router.get('/', protect, admin, async (req, res) => {
+  try {
+    const totalOrders = await Order.countDocuments();
+    const totalProducts = await Product.countDocuments();
+    const totalUsers = await User.countDocuments();
+    const revenueAgg = await Order.aggregate([
+      { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+    ]);
+    const totalRevenue = (revenueAgg && revenueAgg[0] && revenueAgg[0].total) || 0;
+
+    res.status(200).json({
+      totalOrders,
+      totalProducts,
+      totalUsers,
+      totalRevenue
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
