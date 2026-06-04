@@ -2,7 +2,7 @@ const User = require("../model/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
-const gernerateToken = (id) => {
+const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
@@ -25,7 +25,7 @@ const registerUser = async (req, res) => {
 
         const user = await User.create({ name, email, password: hashedPassword });
         if (user) {
-            const otp = Math.floor(100000 + Math.random() * 900000).toString();; // Generate a 6-digit OTP
+            const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP
 
             const message = `Your OTP for email verification is: ${otp}`;
             await sendEmail(email, "Email Verification OTP", message);
@@ -34,7 +34,7 @@ const registerUser = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                token: gernerateToken(user._id),
+                token: generateToken(user._id),
             });
         }
         else {
@@ -56,7 +56,7 @@ const loginUser = async (req, res) => {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
-                token: gernerateToken(user._id)
+                token: generateToken(user._id)
             });
         } else {
             res.status(400).json({ message: 'Invalid email or password'});
