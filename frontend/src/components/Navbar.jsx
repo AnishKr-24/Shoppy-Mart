@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from '../context/AuthContext';
 import "../styles/navbar.scss";
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // Change based on your auth state
+    const { user, logout } = useContext(AuthContext);
+    const isLoggedIn = !!user;
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
@@ -28,21 +30,26 @@ const Navbar = () => {
 
             <ul className={`navbar-links ${menuOpen ? "active" : ""}`}>
                 <li><Link to="/shop">Shop</Link></li>
-                <li><Link to="/products">Products</Link></li>
+                <li><Link to="/shop">Products</Link></li>
                 <li><Link to="/about">About Us</Link></li>
                 <li><Link to="/contact">Contact Us</Link></li>
                 <li><Link to="/cart" className="cart-link" style={{ marginRight: '20px' }}>🛒 Cart</Link></li>
             </ul>
 
             <div className="navbar-actions">
-                
-                
+                {user?.role === 'admin' && (
+                    <>
+                        <Link to="/admin/dashboard" className="btn-admin">
+                            Admin
+                        </Link>
+                    </>
+                )}
                 {isLoggedIn ? (
                     <>
                         <Link to="/profile" className="profile-link">
                             👤 Profile
                         </Link>
-                        <button className="btn-logout" onClick={() => setIsLoggedIn(false)}>
+                        <button className="btn-logout" onClick={logout}>
                             Logout
                         </button>
                     </>
