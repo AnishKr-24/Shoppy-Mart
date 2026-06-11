@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/admin-dashboard.scss';
 
 const AdminDashboard = () => {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    if (!user || user.role !== 'admin') {
+    if (!loading && (!user || user.role !== 'admin')) {
       navigate('/');
       return;
     }
@@ -33,7 +33,7 @@ const AdminDashboard = () => {
       }
     };
     fetchStats();
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
   return (
     <div className="admin-dashboard">

@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
 const gernerateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
 // Register a new user
@@ -22,45 +22,47 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({ name, email, password: hashedPassword });
-    if (user) {
-      const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP
+        const user = await User.create({ name, email, password: hashedPassword });
+        if (user) {
+            const otp = Math.floor(100000 + Math.random() * 900000).toString();; // Generate a 6-digit OTP
 
-      const message = `Your OTP for email verification is: ${otp}`;
-      await sendEmail(email, "Email Verification OTP", message);
-      res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: gernerateToken(user._id),
-      });
-    } else {
-      res.status(400).json({ message: "Invalid user data" });
+            const message = `Your OTP for email verification is: ${otp}`;
+            await sendEmail(email, "Email Verification OTP", message);
+            res.status(201).json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                token: gernerateToken(user._id),
+            });
+        }
+        else {
+            res.status(400).json({ message: "Invalid user data" });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: "Server error" });
     }
-  } catch (error) {
-    return res.status(500).json({ message: "Server error" });
-  }
 };
 
 // Login user
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (user && (await bcrypt.compare(password, user.password))) {
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token: gernerateToken(user._id),
-      });
-    } else {
-      res.status(400).json({ message: "Invalid email or password" });
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if(user && (await bcrypt.compare(password, user.password) )) {
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                token: gernerateToken(user._id)
+            });
+        } else {
+            res.status(400).json({ message: 'Invalid email or password'});
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Server error'})
     }
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
+
 };
 
 const getUsers = async (req, res) => {
@@ -72,8 +74,35 @@ const getUsers = async (req, res) => {
   }
 };
 
+// Update user profile
+const updateProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const { name, email, password } = req.body;
+        if (name) user.name = name;
+        if (email) user.email = email;
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password, salt);
+        }
+
+        const updatedUser = await user.save();
+        res.json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            token: generateToken(updatedUser._id)
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 module.exports = {
-  registerUser,
-  loginUser,
-  getUsers,
+    registerUser,
+    loginUser,
+    getUsers
 };

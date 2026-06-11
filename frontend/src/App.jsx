@@ -23,6 +23,9 @@ import OrderConfirmation from './pages/OrderConfirmation'
 // Import admin pages
 import AdminDashboard from './admin/AdminDashboard'
 import AddProduct from './admin/AddProduct'
+import AdminProducts from './admin/AdminProducts'
+import AdminOrders from './admin/AdminOrders'
+import AdminUsers from './admin/AdminUsers'
 
 // Import all styles
 import './styles/global.scss'
@@ -75,8 +78,12 @@ function App() {
             <Route path="/shipping-info" element={<ShippingInfo />} />
 
             {/* Admin Pages */}
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/add-product" element={<AddProduct />} />
+            <Route path="/admin/products" element={<AdminProducts />} />
+            <Route path="/admin/orders" element={<AdminOrders />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
           </Routes>
         </main>
         <Footer />

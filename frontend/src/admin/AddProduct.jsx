@@ -1,28 +1,37 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/add-product.scss';
 
 const AddProduct = () => {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
     name: '', description: '', price: '', category: '', stock: ''
   });
   const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!loading && (!user || user.role !== 'admin')) {
+      navigate('/');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return <div className="loading-message">Loading...</div>;
+  }
 
   if (!user || user.role !== 'admin') {
-    navigate('/');
     return null;
-  };
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!image) return alert('Please select an image');
     
-    setLoading(true);
+    setSubmitting(true);
     const data = new FormData();
     data.append('name', formData.name);
     data.append('description', formData.description);
@@ -48,7 +57,7 @@ const AddProduct = () => {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -111,8 +120,8 @@ const AddProduct = () => {
           />
         </div>
 
-        <button type="submit" disabled={loading} className="submit-button">
-          {loading ? 'Uploading & Creating...' : 'Publish Product'}
+        <button type="submit" disabled={submitting} className="submit-button">
+          {submitting ? 'Uploading & Creating...' : 'Publish Product'}
         </button>
       </form>
     </div>
