@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Login function
+
   const login = async (email, password) => {
     try {
       const response = await fetch('/api/auth/login', {
@@ -47,6 +48,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Signup function
+
   const signup = async (name, email, password) => {
     try {
       const response = await fetch('/api/auth/signup', {
@@ -120,6 +122,7 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+
 };
 
 export default AuthContext;

@@ -2,7 +2,7 @@ const User = require("../model/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
-const gernerateToken = (id) => {
+const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
@@ -10,6 +10,10 @@ const gernerateToken = (id) => {
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
   try {
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Name, email, and password are required" });
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
@@ -27,20 +31,23 @@ const registerUser = async (req, res) => {
             const otp = Math.floor(100000 + Math.random() * 900000).toString();; // Generate a 6-digit OTP
 
             const message = `Your OTP for email verification is: ${otp}`;
-            await sendEmail(email, "Email Verification OTP", message);
+            sendEmail(email, "Email Verification OTP", message).catch((error) => {
+                console.error("Signup email could not be sent:", error.message);
+            });
             res.status(201).json({
                 _id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                token: gernerateToken(user._id),
+                token: generateToken(user._id),
             });
         }
         else {
             res.status(400).json({ message: "Invalid user data" });
         }
     } catch (error) {
-        return res.status(500).json({ message: "Server error" });
+        console.error("Register user error:", error.message);
+        return res.status(500).json({ message: error.message || "Server error" });
     }
 };
 
@@ -54,7 +61,7 @@ const loginUser = async (req, res) => {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
-                token: gernerateToken(user._id)
+                token: generateToken(user._id)
             });
         } else {
             res.status(400).json({ message: 'Invalid email or password'});
@@ -104,5 +111,6 @@ const updateProfile = async (req, res) => {
 module.exports = {
     registerUser,
     loginUser,
-    getUsers
+    getUsers,
+    updateProfile
 };

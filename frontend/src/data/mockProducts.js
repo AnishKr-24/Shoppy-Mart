@@ -84,9 +84,9 @@ export const mockProducts = [
     category: 'Audio',
     price: 899,
     originalPrice: 1299,
-    image: 'https://images.unsplash.com/photo-1589003077984-894e133814c9?w=500&h=500&fit=crop',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSe_vGO2mOLfFPZ_biQ06C9BKKxkv0zQeBYkS8S_LZ_qg&s=10',
     images: [
-      'https://images.unsplash.com/photo-1589003077984-894e133814c9?w=500&h=500&fit=crop',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSe_vGO2mOLfFPZ_biQ06C9BKKxkv0zQeBYkS8S_LZ_qg&s=10',
       'https://images.unsplash.com/photo-1550355291-bbee04a92027?w=500&h=500&fit=crop',
       'https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=500&h=500&fit=crop'
     ],
@@ -162,9 +162,9 @@ export const mockProducts = [
     category: 'Accessories',
     price: 1299,
     originalPrice: 1799,
-    image: 'https://images.unsplash.com/photo-1587829191301-72f86e09dcf0?w=500&h=500&fit=crop',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoo6lImh7mevDvDFvb25gPSiN2lN6RxKK7JNILhLHA-A&s=10',
     images: [
-      'https://images.unsplash.com/photo-1587829191301-72f86e09dcf0?w=500&h=500&fit=crop',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoo6lImh7mevDvDFvb25gPSiN2lN6RxKK7JNILhLHA-A&s=10',
       'https://images.unsplash.com/photo-1595635266106-c0ef43d52d0f?w=500&h=500&fit=crop',
       'https://images.unsplash.com/photo-1623206635299-2f6b8b28eaf9?w=500&h=500&fit=crop'
     ],
