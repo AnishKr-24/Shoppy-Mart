@@ -11,6 +11,7 @@ const emptyStats = {
   totalRevenue: 0
 };
 
+
 const AdminDashboard = () => {
   const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -123,5 +124,6 @@ const AdminDashboard = () => {
     </div>
   );
 };
+
 
 export default AdminDashboard;
