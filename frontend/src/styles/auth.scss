@@ -1,7 +1,7 @@
 .auth-page {
   min-height: calc(100vh - 200px);
   padding: 40px 20px;
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.05) 0%, rgba(234, 88, 12, 0.02) 100%);
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.06) 0%, color-mix(in srgb, var(--bg-soft) 80%, transparent) 100%);
 
   .auth-container {
     max-width: 450px;
@@ -9,24 +9,35 @@
   }
 
   .auth-card {
-    background: #18181b;
+    background: var(--surface);
     padding: 40px;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 32px var(--shadow);
 
     h1 {
       font-size: 1.8rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--text);
       margin-bottom: 8px;
       text-align: center;
     }
 
     .auth-subtitle {
-      color: #a1a1aa;
+      color: var(--text-muted);
       text-align: center;
       margin-bottom: 30px;
+    }
+
+    .success-message {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      color: #16a34a;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 0.9rem;
     }
 
     .error-message {
@@ -51,30 +62,30 @@
         gap: 8px;
 
         label {
-          color: #a1a1aa;
+          color: var(--text-muted);
           font-weight: 600;
           font-size: 0.95rem;
         }
 
         input {
           padding: 12px 14px;
-          background: #27272a;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: var(--surface-elevated);
+          border: 1px solid var(--border);
           border-radius: 8px;
-          color: #fff;
+          color: var(--text);
           font-size: 0.95rem;
           font-family: inherit;
           transition: all 0.3s;
 
           &::placeholder {
-            color: #71717a;
+            color: var(--text-muted);
           }
 
           &:focus {
             outline: none;
-            border-color: #f97316;
+            border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
-            background: #2a2a2d;
+            background: var(--surface);
           }
 
           &:hover {
@@ -104,7 +115,7 @@
           transition: all 0.3s;
 
           &:hover {
-            color: #fff;
+            color: var(--text);
           }
         }
       }
@@ -129,25 +140,25 @@
           }
 
           &:hover {
-            color: #fff;
+            color: var(--text);
           }
         }
 
         .forgot-link {
-          color: #f97316;
+          color: var(--accent);
           text-decoration: none;
           font-size: 0.9rem;
           transition: color 0.3s;
 
           &:hover {
-            color: #ea580c;
+            color: var(--accent-strong);
           }
         }
       }
 
       .btn-primary {
         padding: 12px;
-        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
         color: #fff;
         border: none;
         border-radius: 8px;
@@ -190,7 +201,7 @@
         }
 
         a {
-          color: #f97316;
+          color: var(--accent);
           text-decoration: none;
 
           &:hover {
@@ -213,11 +224,11 @@
         left: 0;
         width: 100%;
         height: 1px;
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--border);
       }
 
       span {
-        background: #18181b;
+        background: var(--surface);
         padding: 0 10px;
         position: relative;
       }
@@ -230,10 +241,10 @@
 
       .social-btn {
         padding: 12px;
-        background: #27272a;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: var(--surface-elevated);
+        border: 1px solid var(--border);
         border-radius: 8px;
-        color: #a1a1aa;
+        color: var(--text-muted);
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s;
@@ -270,7 +281,7 @@
       margin-top: 20px;
 
       a {
-        color: #f97316;
+        color: var(--accent);
         text-decoration: none;
         font-weight: 600;
 

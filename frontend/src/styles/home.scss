@@ -19,7 +19,7 @@
     h1 {
       font-size: 3.5rem;
       font-weight: 800;
-      color: #fff;
+      color: var(--text);
       margin-bottom: 20px;
       letter-spacing: -1px;
 
@@ -33,7 +33,7 @@
 
     p {
       font-size: 1.3rem;
-      color: #a1a1aa;
+      color: var(--text-muted);
       margin-bottom: 30px;
       line-height: 1.6;
     }
@@ -68,7 +68,7 @@
     h2 {
       font-size: 2.2rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--text);
       margin-bottom: 40px;
       text-align: center;
       position: relative;
@@ -93,8 +93,8 @@
       gap: 30px;
 
       .product-card {
-        background: #18181b;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: var(--surface);
+        border: 1px solid var(--border);
         border-radius: 12px;
         overflow: hidden;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -131,14 +131,14 @@
 
           .product-category {
             font-size: 0.85rem;
-            color: #a1a1aa;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
           }
 
           .product-description {
             font-size: 0.9rem;
-            color: #a1a1aa;
+            color: var(--text-muted);
             line-height: 1.5;
             flex: 1;
           }
@@ -149,7 +149,7 @@
             align-items: center;
             margin-top: auto;
             padding-top: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid var(--border);
 
             .product-price {
               font-size: 1.5rem;
@@ -181,16 +181,16 @@
   }
 
   .categories-section {
-    background: #18181b;
+    background: var(--surface);
     padding: 40px;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
     margin-bottom: 60px;
 
     h2 {
       font-size: 2rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--text);
       margin-bottom: 30px;
       text-align: center;
     }
@@ -285,7 +285,7 @@
 
     .featured-section {
       .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: 15px;
       }
     }

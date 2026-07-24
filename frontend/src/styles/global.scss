@@ -1,5 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
+:root {
+  color-scheme: dark;
+  --bg: #09090b;
+  --bg-soft: #111114;
+  --surface: #18181b;
+  --surface-elevated: #27272a;
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow: rgba(0, 0, 0, 0.45);
+  --accent: #f97316;
+  --accent-strong: #ea580c;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f8fafc;
+  --bg-soft: #eef2f7;
+  --surface: #ffffff;
+  --surface-elevated: #f1f5f9;
+  --text: #111827;
+  --text-muted: #526070;
+  --border: rgba(15, 23, 42, 0.12);
+  --shadow: rgba(15, 23, 42, 0.12);
+  --accent: #ea580c;
+  --accent-strong: #c2410c;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -8,10 +36,11 @@
 }
 
 body {
-  background-color: #09090b;
-  color: #fafafa;
+  background-color: var(--bg);
+  color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 .main-content {
@@ -34,7 +63,7 @@ ul {
 
 /* Premium Buttons */
 .btn {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
   color: #fff;
   padding: 12px 24px;
   border: none;
@@ -67,7 +96,7 @@ h1, h2, h3, h4 {
 
 h2 {
   font-size: 2.2rem;
-  background: linear-gradient(to right, #ffffff, #a1a1aa);
+  background: linear-gradient(to right, var(--text), var(--text-muted));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -83,12 +112,32 @@ h2 {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #09090b; 
+  background: var(--bg); 
 }
 ::-webkit-scrollbar-thumb {
-  background: #27272a; 
+  background: var(--surface-elevated); 
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46; 
+  background: var(--text-muted); 
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 28px 14px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 22px 10px;
+  }
 }
