@@ -91,6 +91,61 @@ const getUsers = async (req, res) => {
   }
 };
 
+const updateUserByAdmin = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const { name, email, role, verified } = req.body;
+
+        if (name) user.name = name.trim();
+        if (email) user.email = email.trim().toLowerCase();
+        if (role) {
+            if (!['user', 'admin'].includes(role)) {
+                return res.status(400).json({ message: 'Invalid role' });
+            }
+            user.role = role;
+        }
+        if (typeof verified === 'boolean') {
+            user.verified = verified;
+        }
+
+        const updatedUser = await user.save();
+        res.json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            verified: updatedUser.verified
+        });
+    } catch (error) {
+        if (error && error.code === 11000) {
+            return res.status(400).json({ message: 'Email already exists' });
+        }
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const deleteUserByAdmin = async (req, res) => {
+    try {
+        if (req.user._id.toString() === req.params.id) {
+            return res.status(400).json({ message: 'You cannot delete your own admin account' });
+        }
+
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        await user.deleteOne();
+        res.json({ message: 'User removed' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 const getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select("-password");
@@ -139,6 +194,8 @@ module.exports = {
     registerUser,
     loginUser,
     getUsers,
+    updateUserByAdmin,
+    deleteUserByAdmin,
     getProfile,
     updateProfile
 };

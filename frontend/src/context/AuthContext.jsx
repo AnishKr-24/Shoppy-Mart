@@ -48,9 +48,14 @@ export const AuthProvider = ({ children }) => {
           }
         });
 
-        if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
           localStorage.removeItem('user');
           setUser(null);
+          return;
+        }
+
+        if (!response.ok) {
+          setUser(parsedUser);
           return;
         }
 
@@ -60,8 +65,12 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(nextUser));
       } catch (error) {
         console.error('Error refreshing user:', error);
-        localStorage.removeItem('user');
-        setUser(null);
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch {
+          localStorage.removeItem('user');
+          setUser(null);
+        }
       } finally {
         setLoading(false);
       }

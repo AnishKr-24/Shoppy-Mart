@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/admin-dashboard.scss';
@@ -11,12 +11,7 @@ const AdminOrders = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== 'admin')) {
-      navigate('/');
-      return;
-    }
-
-    if (!user || user.role !== 'admin') {
+    if (loading || !user || user.role !== 'admin') {
       return;
     }
 
@@ -38,7 +33,7 @@ const AdminOrders = () => {
     };
 
     fetchOrders();
-  }, [user, loading, navigate]);
+  }, [user, loading]);
 
   const updateStatus = async (orderId, status) => {
     try {
@@ -60,18 +55,34 @@ const AdminOrders = () => {
     }
   };
 
+  if (loading) {
+    return <div className="admin-dashboard"><div className="loading-message">Checking admin access...</div></div>;
+  }
+
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="admin-dashboard">
+        <div className="admin-access-card">
+          <h2>Admin Access Only</h2>
+          <p>Please log in with an admin account to manage orders.</p>
+          <button className="btn" onClick={() => navigate('/login')}>Go to Login</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-dashboard">
       <div className="dashboard-header">
         <h2>Manage Orders</h2>
       </div>
 
-      {(loading || fetchLoading) ? (
+      {fetchLoading ? (
         <div className="loading-message">Loading orders...</div>
       ) : error ? (
         <div className="error-message">{error}</div>
       ) : (
-        <div className="stats-grid admin-table">
+        <div className="admin-table">
           {orders.length === 0 ? (
             <div className="empty-state">No orders found.</div>
           ) : (
@@ -88,11 +99,11 @@ const AdminOrders = () => {
               <tbody>
                 {orders.map(order => (
                   <tr key={order._id}>
-                    <td>{order._id}</td>
-                    <td>{order.user?.name || order.user?.email || 'Unknown'}</td>
-                    <td>₹{order.totalAmount}</td>
-                    <td>{order.status}</td>
-                    <td>
+                    <td data-label="Order ID">{order._id}</td>
+                    <td data-label="User">{order.user?.name || order.user?.email || 'Unknown'}</td>
+                    <td data-label="Total">Rs. {order.totalAmount}</td>
+                    <td data-label="Status">{order.status}</td>
+                    <td data-label="Action">
                       <select
                         value={order.status}
                         onChange={(e) => updateStatus(order._id, e.target.value)}
