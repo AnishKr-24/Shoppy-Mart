@@ -9,7 +9,11 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== 'admin')) {
+    if (loading) {
+      return;
+    }
+
+    if (!user || user.role !== 'admin') {
       navigate('/');
       return;
     }

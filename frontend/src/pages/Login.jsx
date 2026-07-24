@@ -1,10 +1,11 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/auth.scss';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useContext(AuthContext) || {};
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,19 +19,12 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+      const result = await login(email.trim(), password);
 
-      const data = await res.json();
-
-      if (res.ok) {
-        if (login) login(data.token, data.user);
-        navigate('/');
+      if (result.success) {
+        navigate('/', { replace: true });
       } else {
-        setError(data.message || 'Login failed');
+        setError(result.error || 'Login failed');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
@@ -47,6 +41,7 @@ const Login = () => {
           <h1>Welcome Back</h1>
           <p className="auth-subtitle">Sign in to your account</p>
 
+          {location.state?.message && <div className="success-message">{location.state.message}</div>}
           {error && <div className="error-message">{error}</div>}
 
           <form onSubmit={handleSubmit} className="auth-form">
@@ -57,6 +52,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
+                autoComplete="email"
                 required
               />
             </div>
@@ -69,6 +65,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
+                  autoComplete="current-password"
                   required
                 />
                 <button
@@ -76,7 +73,7 @@ const Login = () => {
                   className="toggle-password"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                  {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>
@@ -86,10 +83,10 @@ const Login = () => {
                 <input type="checkbox" />
                 <span>Remember me</span>
               </label>
-              <a href="/forgot-password" className="forgot-link">Forgot Password?</a>
+              <Link to="/forgot-password" className="forgot-link">Forgot Password?</Link>
             </div>
 
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <button type="submit" className="btn-primary" disabled={loading || !login}>
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
@@ -97,16 +94,16 @@ const Login = () => {
           <div className="auth-divider">OR</div>
 
           <div className="social-login">
-            <button className="social-btn google">
-              <span>🔍</span> Google
+            <button className="social-btn google" type="button">
+              <span>G</span> Google
             </button>
-            <button className="social-btn facebook">
+            <button className="social-btn facebook" type="button">
               <span>f</span> Facebook
             </button>
           </div>
 
           <p className="auth-switch">
-            Don't have an account? <a href="/signup">Sign Up</a>
+            Don't have an account? <Link to="/signup">Sign Up</Link>
           </p>
         </div>
       </div>

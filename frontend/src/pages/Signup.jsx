@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import '../styles/auth.scss';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { signup } = useContext(AuthContext) || {};
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -34,22 +36,16 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password
-        })
-      });
+      const result = await signup(
+        formData.name.trim(),
+        formData.email.trim(),
+        formData.password
+      );
 
-      const data = await res.json();
-
-      if (res.ok) {
-        navigate('/login', { state: { message: 'Account created! Please login.' } });
+      if (result.success) {
+        navigate('/', { replace: true });
       } else {
-        setError(data.message || 'Signup failed');
+        setError(result.error || 'Signup failed');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
@@ -77,6 +73,7 @@ const Signup = () => {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="John Doe"
+                autoComplete="name"
                 required
               />
             </div>
@@ -89,6 +86,7 @@ const Signup = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="you@example.com"
+                autoComplete="email"
                 required
               />
             </div>
@@ -102,6 +100,7 @@ const Signup = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Create a strong password"
+                  autoComplete="new-password"
                   required
                 />
                 <button
@@ -109,7 +108,7 @@ const Signup = () => {
                   className="toggle-password"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                  {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>
@@ -122,6 +121,7 @@ const Signup = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder="Confirm your password"
+                autoComplete="new-password"
                 required
               />
             </div>
@@ -129,11 +129,11 @@ const Signup = () => {
             <div className="terms-agree">
               <label>
                 <input type="checkbox" required />
-                <span>I agree to the <a href="/terms">Terms & Conditions</a> and <a href="/privacy">Privacy Policy</a></span>
+                <span>I agree to the <Link to="/terms">Terms & Conditions</Link> and <Link to="/privacy-policy">Privacy Policy</Link></span>
               </label>
             </div>
 
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <button type="submit" className="btn-primary" disabled={loading || !signup}>
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
@@ -141,16 +141,16 @@ const Signup = () => {
           <div className="auth-divider">OR</div>
 
           <div className="social-login">
-            <button className="social-btn google">
-              <span>🔍</span> Google
+            <button className="social-btn google" type="button">
+              <span>G</span> Google
             </button>
-            <button className="social-btn facebook">
+            <button className="social-btn facebook" type="button">
               <span>f</span> Facebook
             </button>
           </div>
 
           <p className="auth-switch">
-            Already have an account? <a href="/login">Sign In</a>
+            Already have an account? <Link to="/login">Sign In</Link>
           </p>
         </div>
       </div>

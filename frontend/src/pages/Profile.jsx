@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/profile.scss';
 
 const Profile = () => {
-  const { user, logout } = useContext(AuthContext) || {};
+  const { user, logout, updateProfile } = useContext(AuthContext) || {};
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   const [editMode, setEditMode] = useState(false);
@@ -29,20 +29,13 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      const res = await fetch('/api/auth/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user?.token}`
-        },
-        body: JSON.stringify(profileData)
-      });
+      const result = await updateProfile(profileData);
 
-      if (res.ok) {
+      if (result.success) {
         setEditMode(false);
         alert('Profile updated successfully');
       } else {
-        alert('Failed to update profile');
+        alert(result.error || 'Failed to update profile');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
