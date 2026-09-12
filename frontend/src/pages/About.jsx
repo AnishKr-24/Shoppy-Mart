@@ -23,7 +23,7 @@ const About = () => {
             </p>
           </div>
           <div className="section-image">
-            <img src="/placeholder.png" alt="Our Mission" />
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxPnORLdJwa-TGOwIPWbM3fGHIkNKx9X0_envMpHvXnA&s=10" alt="Our Mission" />
           </div>
         </section>
 
