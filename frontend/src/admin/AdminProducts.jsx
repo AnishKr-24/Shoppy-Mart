@@ -8,7 +8,8 @@ const createProductForm = (product) => ({
   category: product.category || '',
   price: product.price ?? '',
   stock: product.stock ?? '',
-  description: product.description || ''
+  description: product.description || '',
+  imageUrl: product.imageUrl || product.image || ''
 });
 
 const AdminProducts = () => {
@@ -68,15 +69,13 @@ const AdminProducts = () => {
     setSuccess('');
 
     try {
-      const data = new FormData();
-      Object.entries(editForm).forEach(([key, value]) => {
-        data.append(key, value);
-      });
-
       const res = await fetch(`/api/products/${productId}`, {
         method: 'PUT',
-        headers: { Authorization: `Bearer ${user.token}` },
-        body: data
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`
+        },
+        body: JSON.stringify(editForm)
       });
 
       const updatedProduct = await res.json();
@@ -139,7 +138,7 @@ const AdminProducts = () => {
   return (
     <div className="admin-dashboard">
       <div className="dashboard-header admin-page-header">
-        <h2>Manage Products</h2>
+        <h2>Manage Grocery Products</h2>
         <button className="btn compact" onClick={() => navigate('/admin/add-product')}>+ Add Product</button>
       </div>
 
@@ -151,11 +150,12 @@ const AdminProducts = () => {
       ) : (
         <div className="admin-table">
           {products.length === 0 ? (
-            <div className="empty-state">No products found.</div>
+            <div className="empty-state">No products found in database.</div>
           ) : (
             <table>
               <thead>
                 <tr>
+                  <th>Image</th>
                   <th>Name</th>
                   <th>Category</th>
                   <th>Price</th>
@@ -164,43 +164,63 @@ const AdminProducts = () => {
                 </tr>
               </thead>
               <tbody>
-                {products.map(product => (
-                  <tr key={product._id}>
-                    <td data-label="Name">
-                      {editingId === product._id ? (
-                        <input name="name" value={editForm.name} onChange={handleEditChange} />
-                      ) : product.name}
-                    </td>
-                    <td data-label="Category">
-                      {editingId === product._id ? (
-                        <input name="category" value={editForm.category} onChange={handleEditChange} />
-                      ) : product.category}
-                    </td>
-                    <td data-label="Price">
-                      {editingId === product._id ? (
-                        <input name="price" type="number" min="0" value={editForm.price} onChange={handleEditChange} />
-                      ) : `Rs. ${product.price}`}
-                    </td>
-                    <td data-label="Stock">
-                      {editingId === product._id ? (
-                        <input name="stock" type="number" min="0" value={editForm.stock} onChange={handleEditChange} />
-                      ) : product.stock}
-                    </td>
-                    <td data-label="Actions">
-                      {editingId === product._id ? (
-                        <div className="table-actions">
-                          <button className="action-btn save" onClick={() => saveProduct(product._id)} disabled={saving}>Save</button>
-                          <button className="action-btn" onClick={cancelEdit} disabled={saving}>Cancel</button>
-                        </div>
-                      ) : (
-                        <div className="table-actions">
-                          <button className="action-btn" onClick={() => startEdit(product)}>Edit</button>
-                          <button className="action-btn danger" onClick={() => deleteProduct(product._id)}>Delete</button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {products.map(product => {
+                  const imageSrc = product.imageUrl || product.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop';
+                  return (
+                    <tr key={product._id}>
+                      <td data-label="Image">
+                        {editingId === product._id ? (
+                          <input 
+                            name="imageUrl" 
+                            value={editForm.imageUrl} 
+                            onChange={handleEditChange} 
+                            placeholder="Image URL"
+                            style={{ width: '120px' }}
+                          />
+                        ) : (
+                          <img 
+                            src={imageSrc} 
+                            alt={product.name} 
+                            style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '6px' }}
+                          />
+                        )}
+                      </td>
+                      <td data-label="Name">
+                        {editingId === product._id ? (
+                          <input name="name" value={editForm.name} onChange={handleEditChange} />
+                        ) : product.name}
+                      </td>
+                      <td data-label="Category">
+                        {editingId === product._id ? (
+                          <input name="category" value={editForm.category} onChange={handleEditChange} />
+                        ) : product.category}
+                      </td>
+                      <td data-label="Price">
+                        {editingId === product._id ? (
+                          <input name="price" type="number" min="0" value={editForm.price} onChange={handleEditChange} />
+                        ) : `₹${product.price}`}
+                      </td>
+                      <td data-label="Stock">
+                        {editingId === product._id ? (
+                          <input name="stock" type="number" min="0" value={editForm.stock} onChange={handleEditChange} />
+                        ) : product.stock}
+                      </td>
+                      <td data-label="Actions">
+                        {editingId === product._id ? (
+                          <div className="table-actions">
+                            <button className="action-btn save" onClick={() => saveProduct(product._id)} disabled={saving}>Save</button>
+                            <button className="action-btn" onClick={cancelEdit} disabled={saving}>Cancel</button>
+                          </div>
+                        ) : (
+                          <div className="table-actions">
+                            <button className="action-btn" onClick={() => startEdit(product)}>Edit</button>
+                            <button className="action-btn danger" onClick={() => deleteProduct(product._id)}>Delete</button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}

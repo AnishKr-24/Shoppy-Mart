@@ -22,12 +22,37 @@ const Login = () => {
       const result = await login(email.trim(), password);
 
       if (result.success) {
-        navigate('/', { replace: true });
+        if (result.user?.role === 'admin') {
+          navigate('/admin/dashboard', { replace: true });
+        } else {
+          navigate('/', { replace: true });
+        }
       } else {
         setError(result.error || 'Login failed');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAdminQuickFill = async () => {
+    setEmail('admin@shoppymart.com');
+    setPassword('admin123');
+    setError('');
+    setLoading(true);
+
+    try {
+      const result = await login('admin@shoppymart.com', 'admin123');
+      if (result.success) {
+        navigate('/admin/dashboard', { replace: true });
+      } else {
+        setError(result.error || 'Admin login failed. Ensure database seeder was executed.');
+      }
+    } catch (err) {
+      setError('Error signing in as admin.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -40,6 +65,40 @@ const Login = () => {
         <div className="auth-card">
           <h1>Welcome Back</h1>
           <p className="auth-subtitle">Sign in to your account</p>
+
+          <div style={{
+            background: 'rgba(249, 115, 22, 0.1)',
+            border: '1px solid rgba(249, 115, 22, 0.3)',
+            borderRadius: '8px',
+            padding: '12px',
+            marginBottom: '16px',
+            fontSize: '13px',
+            color: '#f97316',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <div>
+              <strong>Admin Demo Account:</strong><br />
+              <code>admin@shoppymart.com</code> / <code>admin123</code>
+            </div>
+            <button
+              type="button"
+              onClick={handleAdminQuickFill}
+              style={{
+                background: '#f97316',
+                color: '#fff',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              Log in as Admin
+            </button>
+          </div>
 
           {location.state?.message && <div className="success-message">{location.state.message}</div>}
           {error && <div className="error-message">{error}</div>}

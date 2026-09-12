@@ -233,19 +233,18 @@
 
   .navbar-menu {
     width: 100%;
-    display: grid;
-    grid-template-rows: 0fr;
+    max-height: 0;
+    opacity: 0;
     overflow: hidden;
-    transition: grid-template-rows 0.25s ease;
+    transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.25s ease;
+    pointer-events: none;
 
     &.active {
-      grid-template-rows: 1fr;
-      padding-top: 8px;
+      max-height: 500px;
+      opacity: 1;
+      padding-top: 12px;
+      pointer-events: auto;
     }
-  }
-
-  .navbar-menu > * {
-    min-height: 0;
   }
 
   .navbar-links,
@@ -257,11 +256,11 @@
   }
 
   .navbar-links {
-    padding: 8px 0 0;
+    padding: 4px 0 0;
 
     a {
       display: block;
-      padding: 11px 12px;
+      padding: 11px 14px;
       border-radius: 8px;
       background: var(--surface);
 
@@ -280,7 +279,7 @@
     }
 
     .profile-link {
-      padding: 11px 12px;
+      padding: 11px 14px;
       border-radius: 8px;
       background: var(--surface);
       text-align: center;

@@ -13,41 +13,65 @@ const ProductDetails = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
-    // Simulate API call with mock data
-    setTimeout(() => {
+    const fetchProduct = async () => {
+      setLoading(true);
       try {
-        const productData = getProductById(productId || '1');
-        if (productData) {
-          setProduct(productData);
-          const related = getRelatedProducts(productData.category, productId, 4);
+        let foundProduct = null;
+        try {
+          const res = await fetch(`/api/products/${productId}`);
+          if (res.ok) {
+            foundProduct = await res.json();
+          }
+        } catch (apiErr) {
+          console.warn('API error fetching product by ID:', apiErr);
+        }
+
+        if (!foundProduct) {
+          foundProduct = getProductById(productId || '1');
+        }
+
+        if (foundProduct) {
+          setProduct(foundProduct);
+          const related = getRelatedProducts(foundProduct.category, productId, 4);
           setRelatedProducts(related);
         }
       } catch (error) {
-        console.error('Error fetching product:', error);
+        console.error('Error in product details:', error);
       } finally {
         setLoading(false);
       }
-    }, 300);
+    };
+
+    fetchProduct();
   }, [productId]);
 
   const handleAddToCart = () => {
-    console.log(`Added ${quantity} of ${product.name} to cart`);
+    alert(`Added ${quantity} of ${product.name} to cart!`);
   };
 
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
-    if (value > 0 && value <= product.stock) {
+    const maxStock = product?.stock ?? 50;
+    if (value > 0 && value <= maxStock) {
       setQuantity(value);
     }
   };
 
   if (loading) {
-    return <div className="loading-page">Loading product details...</div>;
-  };
+    return <div className="loading-page">Loading grocery product details...</div>;
+  }
 
   if (!product) {
-    return <div className="error-page">Product not found</div>;
-  };
+    return (
+      <div className="error-page">
+        <h2>Product not found</h2>
+        <button className="btn" onClick={() => navigate('/shop')}>Back to Shop</button>
+      </div>
+    );
+  }
+
+  const primaryImage = product.imageUrl || product.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop';
+  const imageList = product.images && product.images.length > 0 ? product.images : [primaryImage];
 
   return (
     <div className="product-details-page">
@@ -56,19 +80,21 @@ const ProductDetails = () => {
         {/* Product Images */}
         <div className="product-images">
           <div className="main-image">
-            <img src={product.images?.[selectedImage] || product.image} alt={product.name} />
+            <img src={imageList[selectedImage] || primaryImage} alt={product.name} />
           </div>
-          <div className="image-thumbnails">
-            {(product.images || [product.image, product.image, product.image]).map((img, idx) => (
-              <img
-                key={idx}
-                src={img}
-                alt={`${product.name} ${idx + 1}`}
-                className={`thumbnail ${selectedImage === idx ? 'active' : ''}`}
-                onClick={() => setSelectedImage(idx)}
-              />
-            ))}
-          </div>
+          {imageList.length > 1 && (
+            <div className="image-thumbnails">
+              {imageList.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt={`${product.name} ${idx + 1}`}
+                  className={`thumbnail ${selectedImage === idx ? 'active' : ''}`}
+                  onClick={() => setSelectedImage(idx)}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Product Information */}
@@ -81,14 +107,14 @@ const ProductDetails = () => {
           {/* Rating */}
           <div className="product-rating">
             <div className="stars">{'★'.repeat(Math.round(product.rating || 5))}{'☆'.repeat(5 - Math.round(product.rating || 5))}</div>
-            <span className="rating-count">({product.reviews} reviews)</span>
+            <span className="rating-count">({product.numReviews || product.reviews || 50} reviews)</span>
           </div>
 
           {/* Price */}
           <div className="product-pricing">
             <div className="price">₹{product.price}</div>
-            <div className="original-price">₹{Math.round(product.price * 1.2)}</div>
-            <div className="discount">20% OFF</div>
+            <div className="original-price">₹{product.originalPrice || Math.round(product.price * 1.2)}</div>
+            <div className="discount">Special Indian Grocery Deal</div>
           </div>
 
           {/* Description */}
@@ -99,16 +125,23 @@ const ProductDetails = () => {
 
           {/* Specifications */}
           <div className="product-specs">
-            <h3>Specifications</h3>
+            <h3>Product Details & Specifications</h3>
             <ul>
-              {product.specs && Object.entries(product.specs).map(([key, value]) => (
-                <li key={key}>
-                  <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {value}
-                </li>
-              ))}
-              <li><strong>Stock Available:</strong> {product.stock} units</li>
-              <li><strong>Shipping:</strong> Free shipping on orders above ₹500</li>
-              <li><strong>Returns:</strong> 30-day money-back guarantee</li>
+              {product.specs ? (
+                Object.entries(product.specs).map(([key, value]) => (
+                  <li key={key}>
+                    <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {value}
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li><strong>Quality:</strong> 100% Authentic Indian Brand</li>
+                  <li><strong>Category:</strong> {product.category}</li>
+                </>
+              )}
+              <li><strong>Stock Available:</strong> {product.stock ?? 50} units</li>
+              <li><strong>Delivery:</strong> Free Express Delivery on orders above ₹499</li>
+              <li><strong>Guarantee:</strong> 100% Fresh & Authentic Quality</li>
             </ul>
           </div>
 
@@ -116,8 +149,8 @@ const ProductDetails = () => {
           <div className="product-actions">
             <div className="quantity-selector">
               <label>Quantity:</label>
-              <select value={quantity} onChange={handleQuantityChange} disabled={product.stock === 0}>
-                {Array.from({ length: Math.min(product.stock, 10) }, (_, i) => (
+              <select value={quantity} onChange={handleQuantityChange} disabled={(product.stock ?? 50) === 0}>
+                {Array.from({ length: Math.min(product.stock ?? 10, 10) }, (_, i) => (
                   <option key={i + 1} value={i + 1}>{i + 1}</option>
                 ))}
               </select>
@@ -126,9 +159,9 @@ const ProductDetails = () => {
             <button
               className="add-to-cart-btn"
               onClick={handleAddToCart}
-              disabled={product.stock === 0}
+              disabled={(product.stock ?? 50) === 0}
             >
-              {product.stock > 0 ? `Add to Cart (₹${product.price * quantity})` : 'Out of Stock'}
+              {(product.stock ?? 50) > 0 ? `Add to Cart (₹${product.price * quantity})` : 'Out of Stock'}
             </button>
 
             <button className="wishlist-btn">♡ Add to Wishlist</button>
@@ -137,9 +170,9 @@ const ProductDetails = () => {
           {/* Benefits */}
           <div className="product-benefits">
             {(product.benefits || [
-              '✓ 100% Authentic Products',
-              '✓ Secure Checkout',
-              '✓ Fast & Free Delivery'
+              '✓ 100% Authentic Indian Grocery',
+              '✓ Hygienically Packed & Sealed',
+              '✓ Fast Doorstep Delivery'
             ]).map((benefit, idx) => (
               <div key={idx} className="benefit">
                 <span className="icon">{benefit.split(' ')[0]}</span>
@@ -153,26 +186,28 @@ const ProductDetails = () => {
       {/* Related Products */}
       {relatedProducts.length > 0 && (
         <section className="related-products">
-          <h2>Related Products</h2>
+          <h2>Related Grocery Items</h2>
           <div className="related-grid">
-            {relatedProducts.slice(0, 4).map((prod) => (
-              <div
-                key={prod._id}
-                className="related-card"
-                onClick={() => navigate(`/product/${prod._id}`)}
-              >
-                <img src={prod.image || '/placeholder.png'} alt={prod.name} />
-                <h4>{prod.name}</h4>
-                <p className="price">₹{prod.price}</p>
-                <button className="quick-view">Quick View</button>
-              </div>
-            ))}
+            {relatedProducts.slice(0, 4).map((prod) => {
+              const relImg = prod.imageUrl || prod.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop';
+              return (
+                <div
+                  key={prod._id}
+                  className="related-card"
+                  onClick={() => navigate(`/product/${prod._id}`)}
+                >
+                  <img src={relImg} alt={prod.name} />
+                  <h4>{prod.name}</h4>
+                  <p className="price">₹{prod.price}</p>
+                  <button className="quick-view">View Details</button>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
     </div>
   );
-  
 };
 
 export default ProductDetails;

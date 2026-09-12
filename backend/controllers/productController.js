@@ -25,62 +25,76 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
     try {
-        const { name, description, price, category, stock } = req.body;
-        let imageUrl = '';
+        const { name, description, price, category, stock, imageUrl: bodyImageUrl } = req.body;
+        let imageUrl = bodyImageUrl || '';
         if (req.file) {
-            const result = await cloudinary.uploader.upload(req.file.path);
-            imageUrl = result.secure_url;
+            try {
+                const result = await cloudinary.uploader.upload(req.file.path);
+                imageUrl = result.secure_url;
+            } catch (cloudErr) {
+                console.warn('Cloudinary upload failed, falling back to local path:', cloudErr.message);
+                imageUrl = `/uploads/${req.file.filename}`;
+            }
+        }
+        if (!imageUrl) {
+            imageUrl = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop';
         }
         const product = new Product({
             name,
             description,
-            price,
+            price: Number(price),
             category,
-            stock,
+            stock: Number(stock),
             imageUrl
         });
         const savedProduct = await product.save();
         res.status(201).json(savedProduct);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' })
+        console.error('Create product error:', error);
+        res.status(500).json({ message: error.message || 'Server error' });
     }
 };
 
 const updateProduct = async (req, res) => {
     try {
-        const { name, description, price, category, stock } = req.body;
+        const { name, description, price, category, stock, imageUrl: bodyImageUrl } = req.body;
         const product = await Product.findById(req.params.id);
         if (product) {
-            product.name = name !== undefined ? name : product.name;
-            product.description = description !== undefined ? description : product.description;
-            product.price = price !== undefined ? Number(price) : product.price;
-            product.category = category !== undefined ? category : product.category;
-            product.stock = stock !== undefined ? Number(stock) : product.stock;
-            if (req.file) {
-                const result = await cloudinary.uploader.upload(req.file.path);
-                product.imageUrl = result.secure_url;
+            if (name !== undefined) product.name = name;
+            if (description !== undefined) product.description = description;
+            if (price !== undefined) product.price = Number(price);
+            if (category !== undefined) product.category = category;
+            if (stock !== undefined) product.stock = Number(stock);
+            if (bodyImageUrl !== undefined && bodyImageUrl.trim() !== '') {
+                product.imageUrl = bodyImageUrl;
             }
-            const updateProduct = await product.save();
-            res.json(updateProduct);
-        }
-        else {
+            if (req.file) {
+                try {
+                    const result = await cloudinary.uploader.upload(req.file.path);
+                    product.imageUrl = result.secure_url;
+                } catch (cloudErr) {
+                    console.warn('Cloudinary upload failed, falling back to local path:', cloudErr.message);
+                    product.imageUrl = `/uploads/${req.file.filename}`;
+                }
+            }
+            const updatedProduct = await product.save();
+            res.json(updatedProduct);
+        } else {
             res.status(404).json({ message: 'Product Not Found' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Server error' })
+        console.error('Update product error:', error);
+        res.status(500).json({ message: error.message || 'Server error' });
     }
 };
 
 const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
-
         if (product) {
             await product.deleteOne();
-            // await product.remove();
-            res.json({ message: 'Product removed' })
-        }
-        else {
+            res.json({ message: 'Product removed' });
+        } else {
             res.status(404).json({ message: 'Product not found' });
         }
     } catch (error) {
@@ -95,4 +109,3 @@ module.exports = {
     updateProduct,
     deleteProduct
 };
-

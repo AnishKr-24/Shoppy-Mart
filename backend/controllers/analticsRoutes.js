@@ -1,6 +1,6 @@
-const Order = require('../models/OrderModel');
-const User = require('../models/userModel');
-const Product = require('../models/productModel');
+const Order = require('../model/Order');
+const User = require('../model/User');
+const Product = require('../model/Product');
 
 const getAdminStats = async (req, res) => {
     try {
@@ -8,7 +8,7 @@ const getAdminStats = async (req, res) => {
         const totalOrders = await Order.countDocuments();
         const totalProducts = await Product.countDocuments();
         const orders = await Order.find({});
-        const totalRevenueData = orders.reduce((acc, order) => acc + order.totalAmount, 0)
+        const totalRevenueData = orders.reduce((acc, order) => acc + (order.totalAmount || 0), 0);
         
         res.json({
             totalUsers,
@@ -17,8 +17,8 @@ const getAdminStats = async (req, res) => {
             totalRevenue: totalRevenueData
         });
     } catch(error){
-        res.status(500).json({message: 'Error fetching stats', error});
+        res.status(500).json({ message: 'Error fetching stats', error: error.message });
     }
 };
 
-module.exports = { getAdminStats};
+module.exports = { getAdminStats };
