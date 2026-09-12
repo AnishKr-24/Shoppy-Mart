@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { mockProducts } from '../data/mockProducts';
+import { CartContext } from '../context/CartContext';
 import '../styles/shop.scss';
 
 const categories = [
@@ -25,6 +26,7 @@ const sortOptions = [
 const Shop = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { addToCart } = useContext(CartContext);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -88,10 +90,10 @@ const Shop = () => {
     fetchProductsData();
   }, [filters]);
 
-  const handleAddToCart = (e, productId) => {
+  const handleAddToCart = (e, product) => {
     e.stopPropagation();
-    console.log('Added to cart:', productId);
-    alert('Item added to cart!');
+    addToCart(product, 1);
+    alert(`Added ${product.name} to cart!`);
   };
 
   return (
@@ -199,7 +201,7 @@ const Shop = () => {
                             <span className="product-price">₹{product.price}</span>
                             <button
                               className="add-to-cart-btn"
-                              onClick={(e) => handleAddToCart(e, product._id)}
+                              onClick={(e) => handleAddToCart(e, product)}
                               disabled={(product.stock ?? 10) === 0}
                             >
                               {(product.stock ?? 10) > 0 ? 'Add to Cart' : 'Out of Stock'}

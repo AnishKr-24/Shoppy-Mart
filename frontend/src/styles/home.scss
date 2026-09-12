@@ -125,7 +125,7 @@
           .product-name {
             font-size: 1.1rem;
             font-weight: 600;
-            color: #fff;
+            color: var(--text);
             line-height: 1.4;
           }
 
@@ -223,7 +223,7 @@
         .category-name {
           font-size: 1.2rem;
           font-weight: 600;
-          color: #fff;
+          color: var(--text);
         }
       }
     }

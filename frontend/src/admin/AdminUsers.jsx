@@ -1,16 +1,32 @@
 import { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import AdminNav from './AdminNav';
 import '../styles/admin-dashboard.scss';
 
 const AdminUsers = () => {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [fetchLoading, setFetchLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loggingIn, setLoggingIn] = useState(false);
+
+  const handleAdminQuickLogin = async () => {
+    setLoggingIn(true);
+    try {
+      const res = await login('admin@shoppymart.com', 'admin123');
+      if (!res.success) {
+        alert(res.error || 'Admin login failed. Ensure database seeder was run.');
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoggingIn(false);
+    }
+  };
 
   useEffect(() => {
     if (loading || !user || user.role !== 'admin') {
@@ -95,7 +111,7 @@ const AdminUsers = () => {
     }
   };
 
-  if (loading) {
+  if (loading || loggingIn) {
     return <div className="admin-dashboard"><div className="loading-message">Checking admin access...</div></div>;
   }
 
@@ -103,9 +119,16 @@ const AdminUsers = () => {
     return (
       <div className="admin-dashboard">
         <div className="admin-access-card">
-          <h2>Admin Access Only</h2>
+          <h2>Admin Access Required</h2>
           <p>Please log in with an admin account to view users.</p>
-          <button className="btn" onClick={() => navigate('/login')}>Go to Login</button>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button className="btn" onClick={handleAdminQuickLogin}>
+              Log in as Admin (Demo)
+            </button>
+            <button className="btn secondary" onClick={() => navigate('/login')}>
+              Custom Login
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -113,6 +136,7 @@ const AdminUsers = () => {
 
   return (
     <div className="admin-dashboard">
+      <AdminNav />
       <div className="dashboard-header">
         <h2>Users Directory</h2>
       </div>

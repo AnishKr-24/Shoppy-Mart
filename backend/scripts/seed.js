@@ -295,6 +295,26 @@ const seedDB = async () => {
       console.log('Admin user exists and role verified as admin.');
     }
 
+    // Seed Demo Customer User
+    const customerEmail = 'user@shoppymart.com';
+    let customer = await User.findOne({ email: customerEmail });
+    if (!customer) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash('user123', salt);
+      customer = await User.create({
+        name: 'Demo Customer',
+        email: customerEmail,
+        password: hashedPassword,
+        role: 'user',
+        verified: true
+      });
+      console.log('Demo customer user created successfully (email: user@shoppymart.com, password: user123)');
+    } else {
+      customer.role = 'user';
+      await customer.save();
+      console.log('Demo customer user exists.');
+    }
+
     // Seed Products
     await Product.deleteMany({});
     console.log('Cleared existing products.');

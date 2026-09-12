@@ -59,6 +59,27 @@ const Login = () => {
     }
   };
 
+  const handleCustomerQuickFill = async () => {
+    setEmail('user@shoppymart.com');
+    setPassword('user123');
+    setError('');
+    setLoading(true);
+
+    try {
+      const result = await login('user@shoppymart.com', 'user123');
+      if (result.success) {
+        navigate('/', { replace: true });
+      } else {
+        setError(result.error || 'Customer login failed. Ensure database seeder was executed.');
+      }
+    } catch (err) {
+      setError('Error signing in as customer.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="auth-page login-page">
       <div className="auth-container">
@@ -67,37 +88,79 @@ const Login = () => {
           <p className="auth-subtitle">Sign in to your account</p>
 
           <div style={{
-            background: 'rgba(249, 115, 22, 0.1)',
+            background: 'rgba(249, 115, 22, 0.08)',
             border: '1px solid rgba(249, 115, 22, 0.3)',
-            borderRadius: '8px',
-            padding: '12px',
-            marginBottom: '16px',
+            borderRadius: '10px',
+            padding: '14px',
+            marginBottom: '20px',
             fontSize: '13px',
-            color: '#f97316',
+            color: 'var(--text)',
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
+            flexDirection: 'column',
+            gap: '10px'
           }}>
-            <div>
-              <strong>Admin Demo Account:</strong><br />
-              <code>admin@shoppymart.com</code> / <code>admin123</code>
+            <div style={{ fontWeight: '600', color: '#f97316', fontSize: '14px' }}>
+              ⚡ 1-Click Demo Login (Pre-Approved Instant Access)
             </div>
-            <button
-              type="button"
-              onClick={handleAdminQuickFill}
-              style={{
-                background: '#f97316',
-                color: '#fff',
-                border: 'none',
-                padding: '6px 12px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              Log in as Admin
-            </button>
+            
+            <div style={{
+              display: 'flex',
+              gap: '10px',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <strong>Customer:</strong> <code>user@shoppymart.com</code>
+              </div>
+              <button
+                type="button"
+                onClick={handleCustomerQuickFill}
+                disabled={loading}
+                style={{
+                  background: 'var(--surface-elevated)',
+                  color: 'var(--text)',
+                  border: '1px solid var(--border)',
+                  padding: '7px 14px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Log in as Customer
+              </button>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '10px',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <strong>Admin:</strong> <code>admin@shoppymart.com</code>
+              </div>
+              <button
+                type="button"
+                onClick={handleAdminQuickFill}
+                disabled={loading}
+                style={{
+                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '7px 14px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                Log in as Admin
+              </button>
+            </div>
           </div>
 
           {location.state?.message && <div className="success-message">{location.state.message}</div>}

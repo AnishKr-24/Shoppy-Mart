@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CartContext } from '../context/CartContext';
 import '../styles/checkout.scss';
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const { cartItems, clearCart, totalAmount } = useContext(CartContext);
+
   const [activeStep, setActiveStep] = useState(1);
   const [formData, setFormData] = useState({
     // Shipping
@@ -50,18 +53,14 @@ const Checkout = () => {
 
   const handlePlaceOrder = async () => {
     console.log('Placing order with:', formData);
-    // API call would go here
+    clearCart();
     navigate('/order-confirmation');
   };
 
-  // Sample order data
-  const orderItems = [
-    // { _id: 1, name: 'Product 1', price: 999, quantity: 2 }
-  ];
-  const subtotal = 1998;
-  const shipping = 0;
-  const tax = 100;
-  const total = 2098;
+  const subtotal = totalAmount;
+  const shipping = totalAmount > 500 ? 0 : (totalAmount > 0 ? 50 : 0);
+  const tax = Math.round(totalAmount * 0.05);
+  const total = subtotal + shipping + tax;
 
   return (
     <div className="checkout-page">
@@ -292,9 +291,9 @@ const Checkout = () => {
 
                 <div className="review-section">
                   <h3>Order Items</h3>
-                  {orderItems.length > 0 ? (
+                  {cartItems && cartItems.length > 0 ? (
                     <ul className="order-items-list">
-                      {orderItems.map(item => (
+                      {cartItems.map(item => (
                         <li key={item._id}>
                           {item.name} × {item.quantity} = ₹{item.price * item.quantity}
                         </li>
@@ -333,8 +332,8 @@ const Checkout = () => {
             <h2>Order Summary</h2>
             
             <div className="order-items">
-              {orderItems.length > 0 ? (
-                orderItems.map(item => (
+              {cartItems && cartItems.length > 0 ? (
+                cartItems.map(item => (
                   <div key={item._id} className="order-item">
                     <span>{item.name} × {item.quantity}</span>
                     <span>₹{item.price * item.quantity}</span>
@@ -349,7 +348,7 @@ const Checkout = () => {
 
             <div className="summary-row">
               <span>Subtotal</span>
-              <span>₹{subtotal.toLocaleString()}</span>
+              <span>₹{subtotal.toLocaleString('en-IN')}</span>
             </div>
 
             <div className="summary-row">
@@ -360,13 +359,13 @@ const Checkout = () => {
             </div>
 
             <div className="summary-row">
-              <span>Tax</span>
+              <span>Tax (5% GST)</span>
               <span>₹{tax}</span>
             </div>
 
             <div className="summary-row total">
               <span>Total</span>
-              <span>₹{total.toLocaleString()}</span>
+              <span>₹{total.toLocaleString('en-IN')}</span>
             </div>
 
             <div className="security-badge">

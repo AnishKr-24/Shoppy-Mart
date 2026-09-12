@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import AdminNav from './AdminNav';
 import Logo from '../assets/Logo.png';
 import '../styles/admin-dashboard.scss';
 
@@ -11,11 +12,11 @@ const emptyStats = {
   totalRevenue: 0
 };
 
-
 const AdminDashboard = () => {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
+  const [loggingIn, setLoggingIn] = useState(false);
 
   useEffect(() => {
     if (loading || !user || user.role !== 'admin') {
@@ -27,11 +28,6 @@ const AdminDashboard = () => {
         const res = await fetch('/api/analytics', {
           headers: { Authorization: `Bearer ${user.token}` }
         });
-
-        if (res.status === 401 || res.status === 403) {
-          navigate('/login');
-          return;
-        }
 
         if (!res.ok) {
           setStats(emptyStats);
@@ -47,31 +43,40 @@ const AdminDashboard = () => {
     };
 
     fetchStats();
-  }, [user, loading, navigate]);
+  }, [user, loading]);
 
-  if (loading) {
+  const handleAdminQuickLogin = async () => {
+    setLoggingIn(true);
+    try {
+      const res = await login('admin@shoppymart.com', 'admin123');
+      if (!res.success) {
+        alert(res.error || 'Admin login failed. Ensure database seeder was run.');
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoggingIn(false);
+    }
+  };
+
+  if (loading || loggingIn) {
     return <div className="admin-dashboard"><div className="loading-message">Checking admin access...</div></div>;
   }
 
-  if (!user) {
+  if (!user || user.role !== 'admin') {
     return (
       <div className="admin-dashboard">
         <div className="admin-access-card">
           <h2>Admin Login Required</h2>
-          <p>Please sign in with an admin account to open the dashboard.</p>
-          <button className="btn" onClick={() => navigate('/login')}>Go to Login</button>
-        </div>
-      </div>
-    );
-  }
-
-  if (user.role !== 'admin') {
-    return (
-      <div className="admin-dashboard">
-        <div className="admin-access-card">
-          <h2>Admin Access Only</h2>
-          <p>Your current account is a regular user account. Log in with an account whose role is set to admin.</p>
-          <button className="btn" onClick={() => navigate('/')}>Back to Home</button>
+          <p>You need an admin account to access the administrative dashboard and controls.</p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button className="btn" onClick={handleAdminQuickLogin}>
+              Log in as Admin (Demo)
+            </button>
+            <button className="btn secondary" onClick={() => navigate('/login')}>
+              Custom Login
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -81,9 +86,13 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
+      <AdminNav />
+
       <div className="dashboard-header">
-        <img src={Logo} alt="Shoppy Mart Logo" className="header-logo" />
-        <h2>Admin Dashboard</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src={Logo} alt="Shoppy Mart Logo" className="header-logo" />
+          <h2>Admin Dashboard</h2>
+        </div>
       </div>
 
       <p className="dashboard-welcome">Welcome back, <span className="welcome-name">{user.name}</span></p>
@@ -104,7 +113,7 @@ const AdminDashboard = () => {
           </div>
           <div className="stat-card">
             <h4 className="stat-label">Total Revenue</h4>
-            <div className="stat-number">Rs. {totalRevenue.toFixed(2)}</div>
+            <div className="stat-number">₹{totalRevenue.toFixed(2)}</div>
           </div>
         </div>
       ) : (
@@ -124,6 +133,5 @@ const AdminDashboard = () => {
     </div>
   );
 };
-
 
 export default AdminDashboard;

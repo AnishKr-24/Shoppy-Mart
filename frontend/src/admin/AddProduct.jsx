@@ -1,6 +1,8 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import AdminNav from './AdminNav';
+import '../styles/admin-dashboard.scss';
 import '../styles/add-product.scss';
 
 const groceryCategories = [
@@ -15,7 +17,7 @@ const groceryCategories = [
 ];
 
 const AddProduct = () => {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, login } = useContext(AuthContext);
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -30,19 +32,43 @@ const AddProduct = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [loggingIn, setLoggingIn] = useState(false);
 
-  useEffect(() => {
-    if (!loading && (!user || user.role !== 'admin')) {
-      navigate('/');
+  const handleAdminQuickLogin = async () => {
+    setLoggingIn(true);
+    try {
+      const res = await login('admin@shoppymart.com', 'admin123');
+      if (!res.success) {
+        alert(res.error || 'Admin login failed. Ensure database seeder was run.');
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoggingIn(false);
     }
-  }, [user, loading, navigate]);
+  };
 
-  if (loading) {
-    return <div className="loading-message">Checking admin access...</div>;
+  if (loading || loggingIn) {
+    return <div className="admin-dashboard"><div className="loading-message">Checking admin access...</div></div>;
   }
 
   if (!user || user.role !== 'admin') {
-    return null;
+    return (
+      <div className="admin-dashboard">
+        <div className="admin-access-card">
+          <h2>Admin Access Required</h2>
+          <p>Please log in with an admin account to add products.</p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button className="btn" onClick={handleAdminQuickLogin}>
+              Log in as Admin (Demo)
+            </button>
+            <button className="btn secondary" onClick={() => navigate('/login')}>
+              Custom Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const handleSubmit = async (e) => {
@@ -98,8 +124,10 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="add-product-container">
-      <h2>Add New Grocery Product</h2>
+    <div className="admin-dashboard">
+      <AdminNav />
+      <div className="add-product-container" style={{ margin: '0 auto' }}>
+        <h2>Add New Grocery Product</h2>
       <form onSubmit={handleSubmit} className="product-form">
         <div className="form-group">
           <label>Product Name</label>
@@ -202,6 +230,7 @@ const AddProduct = () => {
           {submitting ? 'Publishing Product...' : 'Publish Grocery Product'}
         </button>
       </form>
+      </div>
     </div>
   );
 };

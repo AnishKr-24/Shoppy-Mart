@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getProductById, getRelatedProducts } from '../data/mockProducts';
+import { getProductById, mockProducts } from '../data/mockProducts';
+import { CartContext } from '../context/CartContext';
 import '../styles/product-details.scss';
 
 const ProductDetails = () => {
-  const { productId } = useParams();
+  const params = useParams();
+  const activeId = params.id || params.productId || '1';
   const navigate = useNavigate();
+  const { addToCart } = useContext(CartContext);
+
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -13,40 +17,76 @@ const ProductDetails = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchProductAndRelated = async () => {
       setLoading(true);
+      setSelectedImage(0);
+      setQuantity(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
       try {
         let foundProduct = null;
+        let allProds = [];
+
+        // Try API fetch first
         try {
-          const res = await fetch(`/api/products/${productId}`);
+          const res = await fetch(`/api/products/${activeId}`);
           if (res.ok) {
             foundProduct = await res.json();
           }
+
+          const resAll = await fetch('/api/products');
+          if (resAll.ok) {
+            const dataAll = await resAll.json();
+            if (Array.isArray(dataAll) && dataAll.length > 0) {
+              allProds = dataAll;
+            }
+          }
         } catch (apiErr) {
-          console.warn('API error fetching product by ID:', apiErr);
+          console.warn('API fetch warning in ProductDetails:', apiErr);
         }
 
         if (!foundProduct) {
-          foundProduct = getProductById(productId || '1');
+          foundProduct = getProductById(activeId);
+        }
+
+        if (allProds.length === 0) {
+          allProds = mockProducts;
         }
 
         if (foundProduct) {
           setProduct(foundProduct);
-          const related = getRelatedProducts(foundProduct.category, productId, 4);
-          setRelatedProducts(related);
+
+          // Get related products: Prioritize same category, fill up with other grocery items up to 6 products
+          const otherProducts = allProds.filter(
+            p => String(p._id) !== String(foundProduct._id) && String(p._id) !== String(activeId)
+          );
+
+          const sameCategoryProducts = otherProducts.filter(
+            p => p.category && p.category.toLowerCase() === foundProduct.category?.toLowerCase()
+          );
+
+          const fallbackProducts = otherProducts.filter(
+            p => !p.category || p.category.toLowerCase() !== foundProduct.category?.toLowerCase()
+          );
+
+          const combinedRelated = [...sameCategoryProducts, ...fallbackProducts].slice(0, 6);
+          setRelatedProducts(combinedRelated);
         }
       } catch (error) {
-        console.error('Error in product details:', error);
+        console.error('Error loading product details:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProduct();
-  }, [productId]);
+    fetchProductAndRelated();
+  }, [activeId]);
 
   const handleAddToCart = () => {
-    alert(`Added ${quantity} of ${product.name} to cart!`);
+    if (product) {
+      addToCart(product, quantity);
+      alert(`Added ${quantity} of ${product.name} to cart!`);
+    }
   };
 
   const handleQuantityChange = (e) => {
@@ -55,6 +95,10 @@ const ProductDetails = () => {
     if (value > 0 && value <= maxStock) {
       setQuantity(value);
     }
+  };
+
+  const handleRelatedClick = (relId) => {
+    navigate(`/product/${relId}`);
   };
 
   if (loading) {
@@ -188,18 +232,21 @@ const ProductDetails = () => {
         <section className="related-products">
           <h2>Related Grocery Items</h2>
           <div className="related-grid">
-            {relatedProducts.slice(0, 4).map((prod) => {
+            {relatedProducts.map((prod) => {
               const relImg = prod.imageUrl || prod.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop';
               return (
                 <div
                   key={prod._id}
                   className="related-card"
-                  onClick={() => navigate(`/product/${prod._id}`)}
+                  onClick={() => handleRelatedClick(prod._id)}
                 >
                   <img src={relImg} alt={prod.name} />
-                  <h4>{prod.name}</h4>
-                  <p className="price">₹{prod.price}</p>
-                  <button className="quick-view">View Details</button>
+                  <div className="related-info">
+                    <h4>{prod.name}</h4>
+                    <p className="category">{prod.category}</p>
+                    <p className="price">₹{prod.price}</p>
+                    <button className="quick-view">View Details</button>
+                  </div>
                 </div>
               );
             })}

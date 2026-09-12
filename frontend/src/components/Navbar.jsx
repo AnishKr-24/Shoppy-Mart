@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from '../context/AuthContext';
+import { CartContext } from '../context/CartContext';
 import Logo from '../assets/Logo.png';
 import "../styles/navbar.scss";
 
@@ -8,6 +9,7 @@ const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
     const { user, logout } = useContext(AuthContext);
+    const { totalItemsCount } = useContext(CartContext) || { totalItemsCount: 0 };
     const isLoggedIn = !!user;
 
     useEffect(() => {
@@ -63,7 +65,19 @@ const Navbar = () => {
                     <li><Link to="/shop" onClick={closeMenu}>Products</Link></li>
                     <li><Link to="/about" onClick={closeMenu}>About Us</Link></li>
                     <li><Link to="/contact" onClick={closeMenu}>Contact Us</Link></li>
-                    <li><Link to="/cart" className="cart-link" onClick={closeMenu}>Cart</Link></li>
+                    <li>
+                        <Link to="/cart" className="cart-link" onClick={closeMenu}>
+                            Cart {totalItemsCount > 0 && <span className="cart-badge" style={{
+                                background: '#f97316',
+                                color: '#fff',
+                                borderRadius: '10px',
+                                padding: '2px 8px',
+                                fontSize: '0.8rem',
+                                marginLeft: '6px',
+                                fontWeight: 'bold'
+                            }}>{totalItemsCount}</span>}
+                        </Link>
+                    </li>
                 </ul>
 
                 <div className="navbar-actions">
