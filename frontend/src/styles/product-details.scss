@@ -35,11 +35,12 @@
 
     .image-thumbnails {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
 
       .thumbnail {
-        width: 80px;
-        height: 80px;
+        width: 70px;
+        height: 70px;
         border-radius: 8px;
         border: 2px solid var(--border);
         object-fit: cover;
@@ -99,6 +100,7 @@
       display: flex;
       align-items: center;
       gap: 15px;
+      flex-wrap: wrap;
 
       .price {
         font-size: 2.5rem;

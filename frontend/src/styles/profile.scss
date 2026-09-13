@@ -178,22 +178,26 @@
 
     .orders-table {
       width: 100%;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       border-collapse: collapse;
 
       thead {
-        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 2px solid var(--border);
 
         th {
           text-align: left;
           padding: 12px;
-          color: #a1a1aa;
+          color: var(--text-muted);
           font-weight: 600;
+          white-space: nowrap;
         }
       }
 
       tbody {
         tr {
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          border-bottom: 1px solid var(--border);
 
           &:hover {
             background: rgba(249, 115, 22, 0.05);
@@ -201,7 +205,8 @@
 
           td {
             padding: 12px;
-            color: #fff;
+            color: var(--text);
+            white-space: nowrap;
 
             .status {
               display: inline-block;
